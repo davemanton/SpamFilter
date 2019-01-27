@@ -31,14 +31,24 @@ namespace ConsoleApp
 
             var hamCount = CountColumnValue(subjectWordVectorDataFrame, "is_ham", 1);
             var spamCount = CountColumnValue(subjectWordVectorDataFrame, "is_ham", 0);
-            var topHamTerms = CalculateTopTermsAndSave(subjectWordVectorDataFrame, "is_ham", 1, hamCount, 10, processedDataDirectory);
-            var topSpamTerms = CalculateTopTermsAndSave(subjectWordVectorDataFrame, "is_ham", 0, spamCount, 10, processedDataDirectory);
-
             CreateTotalsBarChart(hamCount, spamCount);
+
+            var topN = 10;
+
+            var hamTermProportions = CalculateTermsAndSave(subjectWordVectorDataFrame, "is_ham", 1, hamCount, processedDataDirectory);
+            var topHamTerms = hamTermProportions.Keys.Take(topN);
+            var topHamTermProportions = hamTermProportions.Values.Take(topN);
+
+            var spamTermProportions = CalculateTermsAndSave(subjectWordVectorDataFrame, "is_ham", 0, spamCount, processedDataDirectory);
+            var topSpamTerms = spamTermProportions.Keys.Take(topN);
+            var topSpamTermProportions = spamTermProportions.Values.Take(topN);
+
+            CreateTopTermsBarchart(topHamTerms, topHamTermProportions, spamTermProportions, "Ham", "Spam");
+            CreateTopTermsBarchart(topSpamTerms, topSpamTermProportions, hamTermProportions, "Spam", "Ham");
+
 
             Console.WriteLine(" --- Data Preparation Complete --- ");
             Console.ReadKey();
-
         }
 
         private static Frame<int, string> ProcessEmailsAndCreateCsv(string processedDataDirectory)
@@ -62,6 +72,8 @@ namespace ConsoleApp
 
         private static Frame<int, string> ParseEmails(IEnumerable<string> files)
         {
+            const string eaTrialVersionRemark = "(Trial Version)";
+
             var rows = files.Select((file, index) =>
             {
                 Console.WriteLine($"Parsing Email: {index}");
@@ -71,7 +83,10 @@ namespace ConsoleApp
 
                 return new {
                     emailNumber = index,
-                    subject = email.Subject
+                    subject = email.Subject.EndsWith(eaTrialVersionRemark) 
+                                ? email.Subject.Substring(0, email.Subject.Length - eaTrialVersionRemark.Length) 
+                                : email.Subject
+
                 };
             });
 
@@ -80,14 +95,19 @@ namespace ConsoleApp
 
         private static Frame<int, string> CreateWordVector(Series<int, string> rows)
         {
+            var stopwords = File.ReadLines("C:/Sandbox/machine-learning/SpamFilter/Config/stopwords.txt")
+                .Distinct()
+                .Select(x => x.ToLower())
+                .ToList();
            
             var wordsByRows = rows.GetAllValues().Select((row, index) =>
             {
                 Console.WriteLine($"Parsing Row: {index}");
                 var seriesBuilder = new SeriesBuilder<string, int>();
 
-                var rowWords = Regex.Matches(row.Value, "\\w+('(s|d|t|ve|m))?")
+                var rowWords = Regex.Matches(row.Value, "[a-zA-Z]+('(s|d|t|ve|m))?")
                 .Cast<Match>()
+                .Where(word => !stopwords.Contains(word.Value.ToLower()))
                 .Select(word => word.Value.ToLower())
                 .Distinct();
 
@@ -115,8 +135,8 @@ namespace ConsoleApp
             => frame.Where(row => row.Value.GetAs<int>(columnName) == value)
                 .RowCount;
 
-        private static IEnumerable<string> CalculateTopTermsAndSave(
-            Frame<int, string> frame, string columnName, int value, int count, int topN, string dataDirectory)
+        private static Series<string, double> CalculateTermsAndSave(
+            Frame<int, string> frame, string columnName, int value, int count, string dataDirectory)
         {
             Console.WriteLine($" --- Processing Top Terms for {columnName} where value is {value} --- ");
 
@@ -127,9 +147,7 @@ namespace ConsoleApp
                     termFrequences.Values,
                     (a, b) => $"{a},{b}"));
 
-            var termProportions = termFrequences / count;
-
-            return termProportions.Keys.Take(topN);
+            return termFrequences / count;
         }
 
         private static void CreateTotalsBarChart(int hamCount, int spamCount)
@@ -142,14 +160,17 @@ namespace ConsoleApp
             barChart.SetTitle("Ham vs. Spam in Sample Set");
         }
 
-        //private static void CreateTermsBarChart(IEnumerable<string> terms, )
-        //{
-        //    var barChart = DataBarBox.Show(
-        //        new string[] { "Hame", "Spam" },
-        //        new double[] { hamCount, spamCount }
-        //        );
+        private static void CreateTopTermsBarchart(IEnumerable<string> terms, IEnumerable<double> proportions, Series<string, double> alternativeProportions, string titleSet, string altSet)
+        {
+            var barChart = DataBarBox.Show(
+                terms.ToArray(),
+                new double[][]
+                    {
+                        proportions.ToArray(),
+                        alternativeProportions.GetItems(terms).Values.ToArray(),
+                    });
 
-        //    barChart.SetTitle("Ham vs. Spam in Sample Set");
-        //}
+            barChart.SetTitle($"Top Terms in {titleSet} Emails (blue: {titleSet.ToUpper()}, red: {altSet})");
+        }
     }
 }
