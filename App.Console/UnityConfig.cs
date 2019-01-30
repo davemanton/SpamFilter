@@ -1,9 +1,10 @@
 ﻿using Common;
 using Data.Analysis;
 using Data.Preparation;
+using Model.Analysis;
 using Unity;
 
-namespace App.Consoler
+namespace App.Console
 {
     public static class UnityConfig
     {
@@ -21,6 +22,10 @@ namespace App.Consoler
                 .RegisterType<ITotalsDataAnalyser, TotalsDataAnalyser>()
                 .RegisterType<ITermsExtractor, TermsExtractor>()
                 .RegisterType<IDataAnalyser, DataAnalyser>()
+                .RegisterType<ITermSelector, TermSelector>()
+                .RegisterType<IFeatureSelector, FeatureSelector>()
+                .RegisterType<IModelBuilder, ModelBuilder>()
+                .RegisterType<IModelAnalyser, ModelAnalyser>()
                 ;
 
             return container;

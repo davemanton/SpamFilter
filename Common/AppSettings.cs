@@ -15,6 +15,7 @@ namespace Common
         string TermsVectorFilePath { get; }
         int NumberTermsToGraph { get; }
         int MinimumTermOccurrences { get; }
+        int ModelNumFolds { get; }
     }
 
     public class AppSettings : IAppSettings
@@ -29,5 +30,6 @@ namespace Common
         public string TermsVectorFilePath => Path.Combine(ProcessedDataDirectory, ConfigurationManager.AppSettings["TermsVectorFilename"]);
         public int NumberTermsToGraph => int.Parse(ConfigurationManager.AppSettings["NumberTermsToGraph"]);
         public int MinimumTermOccurrences => int.Parse(ConfigurationManager.AppSettings["MinimumTermOccurrences"]);
+        public int ModelNumFolds => int.Parse(ConfigurationManager.AppSettings["ModelNumFolds"]);
     }
 }

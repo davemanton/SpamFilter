@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.Design;
-using System.Configuration;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using App.Consoler;
-using Common;
+﻿using System.Linq;
 using Data.Analysis;
 using Data.Preparation;
+using Model.Analysis;
 using Unity;
 
 namespace App.Console
@@ -21,6 +14,7 @@ namespace App.Console
 
             var dataPreparer = dependencyManager.Resolve<IDataPreparer>();
             var dataAnalyser = dependencyManager.Resolve<IDataAnalyser>();
+            var modelAnalyser = dependencyManager.Resolve<IModelAnalyser>();
 
             var action = args.Any() ? args[0] : string.Empty;
 
@@ -33,9 +27,12 @@ namespace App.Console
                     dataAnalyser.Analyse();
                     break;
                 case "model":
+                    modelAnalyser.Analyse();
+                    break;
                 default:
                     dataPreparer.PrepareAndSaveDataAsCsv();
                     dataAnalyser.Analyse();
+                    modelAnalyser.Analyse();
                     break;
             }
 

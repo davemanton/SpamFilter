@@ -76,6 +76,10 @@
       <Project>{C2737758-6F37-46ED-B543-7439A1C524AA}</Project>
       <Name>Data.Preparation</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Model.Analysis\Model.Analysis.csproj">
+      <Project>{CA2537B3-64FA-490B-A6CC-919ABF22A966}</Project>
+      <Name>Model.Analysis</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
