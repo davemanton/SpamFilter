@@ -4,11 +4,6 @@ using Deedle;
 
 namespace Data.Preparation
 {
-    public interface IDataPreparer
-    {
-        void PrepareAndSaveDataAsCsv();
-    }
-
     public class DataPreparer : IDataPreparer
     {
         private readonly IEmailReader _emailReader;

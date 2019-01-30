@@ -1,23 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Drawing.Imaging;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using Common;
 using Deedle;
 using EAGetMail;
 
 namespace Data.Preparation
 {
-    public interface IEmailReader
-    {
-        Frame<int, string> ConvertEmailsToDataFrame();
-    }
-
     public class EmailReader : IEmailReader
     {        
         private readonly IAppSettings _appSettings;
@@ -38,7 +27,7 @@ namespace Data.Preparation
 
         private static Frame<int, string> ParseEmailFiles(IEnumerable<string> files)
         {
-            const string eaTrialVersionRemark = "{Trial Version)";
+            const string eaTrialVersionRemark = "(Trial Version)";
 
             var parsedEmails = files.AsParallel().Select((file, index) =>
             {

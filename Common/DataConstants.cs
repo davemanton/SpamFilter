@@ -14,5 +14,7 @@ namespace Common
         public const string From = "from";
         public const string Subject = "subject";
         public const string Ham = "is_ham";
+        public const string Term = "term";
+        public const string Occurrences = "occurrences";
     }
 }

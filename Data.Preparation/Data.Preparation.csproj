@@ -71,6 +71,9 @@
     <Compile Include="DataPreparer.cs" />
     <Compile Include="EmailLabeler.cs" />
     <Compile Include="EmailReader.cs" />
+    <Compile Include="IDataPreparer.cs" />
+    <Compile Include="IEmailLabeller.cs" />
+    <Compile Include="IEmailReader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -1,14 +1,8 @@
-﻿using System.IO;
-using Common;
+﻿using Common;
 using Deedle;
 
 namespace Data.Preparation
 {
-    public interface IEmailLabeller
-    {
-        void MergeLabelsToEmailData(Frame<int, string> emailDataFrame);
-    }
-
     public class EmailLabeller : IEmailLabeller
     {
         private readonly IAppSettings _appSettings;
